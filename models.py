@@ -21,3 +21,11 @@ class Inventory(Base):
     os_version = Column(String)
     comments = Column(String)
     not_compatible_with = Column(String)
+
+
+class Users(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    password = Column(String)

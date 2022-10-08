@@ -30,7 +30,13 @@ class Item(BaseModel):
     # brand: Optional[str] = None
 
 
+class User(BaseModel):
+    name: str
+    password: str
+
+
 inventory = {}
+users = {}
 
 
 @app.get("/get-items")
@@ -111,3 +117,38 @@ def delete_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"Success": "Item deleted."}
+
+
+@app.get("/get-users")
+def read_api(db: Session = Depends(get_db)):
+    return db.query(models.Users).all()
+
+
+@app.post("/create-user")
+def create_item_in_db(user: User, db: Session = Depends(get_db)):
+    user_model = models.Users()
+
+    user_model.name = user.name
+    user_model.password = user.password
+
+    db.add(user_model)
+    db.commit()
+
+    return {"Data": "User " + user.name + " was added to inventory"}
+
+
+@app.delete("/delete-user/{user_id}")
+def delete_item(user_id: int, db: Session = Depends(get_db)):
+    item_model = db.query(models.Users).filter(models.Users.id == user_id).first()
+
+    if item_model is None:
+        raise HTTPException(
+            status_code=404,
+            detail="User ID does not exist."
+        )
+
+    db.query(models.Users).filter(models.Users.id == user_id).delete()
+
+    db.commit()
+
+    return {"Success": "User was deleted."}
